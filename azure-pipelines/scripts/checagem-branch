@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+echo 'VALIDANDO NOME DA BRANCH...'
+
+# Pegar o nome da branch passado como argumento
+LOCAL_BRANCH_NAME=$1
+echo "Branch recebida: $LOCAL_BRANCH_NAME"
+
+BRANCH_PREFIX_SEPARATOR='/'
+COMMON_LIST_SEPARATOR='|'
+
+# Verificar se a branch é uma exceção
+EXCEPTION_BRANCHES=('main' 'develop' 'hmg')
+if [[ " ${EXCEPTION_BRANCHES[@]} " =~ " ${LOCAL_BRANCH_NAME} " ]]; then
+    echo -e "Branch de exceção: $LOCAL_BRANCH_NAME"
+    exit 0
+fi
+
+# Estágio de Validação do Prefixo da Branch
+ALLOWED_PREFIXES=('feature' 'fix' 'hotfix' 'style' 'refactor' 'test' 'chore' 'docs' 'ci' 'build' 'perf' 'revert' 'release')
+ALLOWED_PREFIXES_PATTERN=$(IFS=$COMMON_LIST_SEPARATOR ; echo "${ALLOWED_PREFIXES[*]}")
+VALID_PREFIX_PATTERN="^(($ALLOWED_PREFIXES_PATTERN)\/([0-9]+)\-([a-zA-Z0-9\-]+))$"
+
+if [[ ! $LOCAL_BRANCH_NAME =~ $VALID_PREFIX_PATTERN ]]; then
+    echo -e "$LOCAL_BRANCH_NAME =~ $VALID_PREFIX_PATTERN"
+    echo -e "\033[31mERRO\033[0m Algo está errado com o prefixo ou nome da branch. \nOs nomes das branches devem seguir o padrão: \033[1mPREFIXO/TASK-NOME-DA-TAREFA\033[0m. \nUse o comando git branch -m para corrigir o nome da branch. \n\nExemplos de prefixos permitidos: \033[1mfeature/\033[0m, \033[1mfix/\033[0m, \033[1mhotfix/\033[0m, \033[1mstyle/\033[0m, \033[1mrefactor/\033[0m, \033[1mtest/\033[0m, \033[1mchore/\033[0m, \033[1mdocs/\033[0m, \033[1mci/\033[0m, \033[1mbuild/\033[0m, \033[1mperf/\033[0m, \033[1mrevert/\033[0m, \033[1mrelease/\033[0m. \n\nExemplo de nome de branch válido: \033[1mfeature/1234-nome-da-tarefa\033[0m."
+    exit 1
+fi
+
+exit 0
+

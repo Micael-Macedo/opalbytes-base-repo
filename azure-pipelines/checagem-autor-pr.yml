@@ -1,0 +1,46 @@
+trigger:
+  branches:
+    exclude:
+      - "*"
+
+pr:
+  branches:
+    include:
+      - develop
+      - hmg
+      - main
+
+pool:
+  name: Azure Pipelines
+  vmImage: "ubuntu-latest"
+
+variables:
+  - template: variables.yml
+
+stages:
+  - stage: verificacao_usuario
+    displayName: "Verificação de Usuário"
+    jobs:
+      - job: "verificacao_usuario_job"
+        displayName: "Verificação de Usuário"
+        steps:
+          - script: |
+              CURRENT_USER="$(Build.RequestedFor)"
+              ALLOWED_USERS=("Mercia Souto Guimaraes" "Micael Santos" "Atila Almeida" "Gabriel Lyrio" "Gabriel Pontes" "Lucas Lima" "Mauricio Souza Menezes")
+
+              USER_AUTHORIZED=false
+              for user in "${ALLOWED_USERS[@]}"; do
+                if [ "$CURRENT_USER" == "$user" ]; then
+                  USER_AUTHORIZED=true
+                  break
+                fi
+              done
+
+              if [ "$USER_AUTHORIZED" = false ]; then
+                echo "Pull requests só podem ser criados por usuários autorizados. Pull request criado por: $CURRENT_USER."
+                echo "Usuários autorizados: ${ALLOWED_USERS[*]}"
+                exit 1
+              else
+                echo "Usuário autorizado: $CURRENT_USER"
+              fi
+            displayName: "Verificar usuários autorizados para PR"

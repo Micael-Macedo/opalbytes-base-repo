@@ -1,0 +1,137 @@
+# ============================================================
+# Pipeline CI/CD - monitora-client (Angular 21)
+# Azure DevOps YAML | Azure App Service + Deployment Slots
+# ============================================================
+
+trigger:
+  branches:
+    include:
+      - main
+      - homologation
+      - develop
+
+pr: none
+
+variables:
+  NODE_VERSION: "22.x"
+  BUILD_OUTPUT: "dist/monitora-client/browser"
+  # ENV_NAME e SLOT_NAME são resolvidos em runtime pelo step "Resolver ambiente"
+
+stages:
+  # ════════════════════════════════════════════════════════════
+  # STAGE 1 — Build
+  # ════════════════════════════════════════════════════════════
+  - stage: Build
+    displayName: "Build"
+    jobs:
+      - job: BuildJob
+        displayName: "npm ci + ng build"
+        pool:
+          vmImage: "ubuntu-latest"
+
+        steps:
+          - checkout: self
+            fetchDepth: 1
+
+          # ── Resolve ENV_NAME e SLOT_NAME com base na branch atual ──
+          - script: |
+              BRANCH="$(Build.SourceBranchName)"
+              echo "Branch detectada: $BRANCH"
+
+              if [ "$BRANCH" = "main" ]; then
+                ENV_NAME="production"
+                BUILD_SCRIPT="production"
+                SLOT_NAME="staging"
+              elif [ "$BRANCH" = "hmg" ]; then
+                ENV_NAME="homologation"
+                BUILD_SCRIPT="homologation"
+                SLOT_NAME="hmg"
+              elif [ "$BRANCH" = "develop" ]; then
+                ENV_NAME="dev"
+                BUILD_SCRIPT="development"
+                SLOT_NAME="dev"
+              else
+                echo "##[error]Branch '$BRANCH' não mapeada. Adicione um mapeamento no step 'Resolver ambiente'."
+                exit 1
+              fi
+
+              echo "ENV_NAME=$ENV_NAME | SLOT_NAME=$SLOT_NAME"
+              echo "##vso[task.setvariable variable=ENV_NAME;isOutput=true]$ENV_NAME"
+              echo "##vso[task.setvariable variable=SLOT_NAME;isOutput=true]$SLOT_NAME"
+              echo "##vso[task.setvariable variable=BUILD_SCRIPT;isOutput=true]$BUILD_SCRIPT"
+            name: SetEnv
+            displayName: "Resolver ambiente (branch → ENV_NAME + SLOT_NAME)"
+
+          - task: NodeTool@0
+            displayName: "Instalar Node.js $(NODE_VERSION)"
+            inputs:
+              versionSpec: $(NODE_VERSION)
+
+          - script: npm install -g npm@11.6.0
+            displayName: "Atualizar npm para 11.6.0"
+
+          - task: Cache@2
+            displayName: "Cache node_modules"
+            inputs:
+              key: 'npm | "$(Agent.OS)" | v2 | package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)" | v2
+              path: node_modules
+
+          - script: npm ci --prefer-offline
+            displayName: "npm ci"
+
+          - script: npm audit --audit-level=critical
+            displayName: "Auditoria de segurança npm"
+
+          - script: |
+              APP_VERSION=$(node -p "require('./package.json').version")
+              APP_BUILD_DATE=$(TZ=America/Sao_Paulo date +%Y-%m-%dT%H:%M:%S%:z)
+              echo "APP_VERSION=$APP_VERSION | APP_BUILD_DATE=$APP_BUILD_DATE"
+              npx ng build \
+                --configuration $(SetEnv.BUILD_SCRIPT) \
+                --define "APP_VERSION='$APP_VERSION'" \
+                --define "APP_BUILD_DATE='$APP_BUILD_DATE'"
+            displayName: "ng build ($(SetEnv.BUILD_SCRIPT))"
+
+          # web.config para App Service Windows — SPA rewrite + mimeType JSON
+          - script: |
+              cat > $(BUILD_OUTPUT)/web.config << 'EOF'
+              <?xml version="1.0" encoding="utf-8"?>
+              <configuration>
+                <system.webServer>
+                  <rewrite>
+                    <rules>
+                      <rule name="Angular Routes" stopProcessing="true">
+                        <match url=".*" />
+                        <conditions logicalGrouping="MatchAll">
+                          <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+                          <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+                        </conditions>
+                        <action type="Rewrite" url="/index.html" />
+                      </rule>
+                    </rules>
+                  </rewrite>
+                  <staticContent>
+                    <mimeMap fileExtension=".json" mimeType="application/json" />
+                    <mimeMap fileExtension=".md" mimeType="text/markdown; charset=utf-8" />
+                  </staticContent>
+                </system.webServer>
+              </configuration>
+              EOF
+            displayName: "Gerar web.config (SPA rewrite)"
+
+          - task: ArchiveFiles@2
+            displayName: "Compactar dist/"
+            inputs:
+              rootFolderOrFile: "$(BUILD_OUTPUT)"
+              includeRootFolder: false
+              archiveType: "zip"
+              archiveFile: "$(Build.ArtifactStagingDirectory)/drop.zip"
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publicar artefato"
+            inputs:
+              PathtoPublish: "$(Build.ArtifactStagingDirectory)"
+              ArtifactName: "drop"
+              publishLocation: "Container"

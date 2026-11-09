@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+echo 'VALIDANDO MENSAGENS DOS COMMITS...'
+
+# Verifica se a branch de destino existe localmente
+if git show-ref --quiet refs/remotes/origin/$TARGET_BRANCH; then
+    # Obtém todos os commits entre a branch do PR e a branch de destino
+    COMMITS=$(git log origin/$TARGET_BRANCH..HEAD --pretty=format:"%H")
+else
+    echo "A branch de destino '$TARGET_BRANCH' não existe no repositório remoto."
+    exit 1
+fi
+
+# Define os prefixos permitidos e suas descrições
+ALLOWED_PREFIXES=('chore' 'feat' 'fix' 'refactor' 'docs' 'perf' 'style' 'test' 'build' 'ci' 'env' 'major' 'minor' 'patch')
+
+# Define o padrão da mensagem do commit
+ALLOWED_PREFIXES_PATTERN=$(
+    IFS=$'|'
+    echo "${ALLOWED_PREFIXES[*]}"
+)
+VALID_COMMIT_MSG_PATTERN="^($ALLOWED_PREFIXES_PATTERN): .+$"
+
+# Define o domínio de e-mail permitido
+ALLOWED_EMAIL_DOMAIN="@renova.net.br"
+
+# Itera sobre cada commit e valida a mensagem e o e-mail do autor
+for COMMIT in $COMMITS; do
+    COMMIT_MSG=$(git log -1 --pretty=%B $COMMIT)
+    AUTHOR_EMAIL=$(git log -1 --pretty=format:"%ae" $COMMIT)
+
+    # Exibe a mensagem do commit
+    echo "Validando commit: $COMMIT"
+    echo "Mensagem do commit: $COMMIT_MSG"
+    echo "E-mail do autor do commit $COMMIT: $AUTHOR_EMAIL"
+
+    # Ignora mensagens de merge
+    if [[ $COMMIT_MSG =~ ^Merge ]]; then
+        echo "Mensagem de merge detectada. Ignorando validação para o commit: $COMMIT"
+        continue
+    fi
+
+    # Valida o padrão da mensagem do commit
+    if [[ ! $COMMIT_MSG =~ $VALID_COMMIT_MSG_PATTERN ]]; then
+        echo -e "\033[31mERRO\033[0m A mensagem do commit é inválida. \nAs mensagens de commit devem seguir o padrão: \033[1mPREFIXO: Descrição\033[0m."
+        echo -e "\n\nPrefixos permitidos:\n\033[32m${ALLOWED_PREFIXES[*]}\033[0m\n"
+        echo -e "Exemplos: \n\033[32mfeat: Adicionar cadastro de usuário\033[0m, \n\033[32mfix: Corrigir problema de login\033[0m, \n\033[32mrefactor: Melhorar estrutura do código\033[0m.\n"
+        exit 1
+    fi
+
+    # Valida o domínio do e-mail do autor
+    if [[ ! $AUTHOR_EMAIL =~ $ALLOWED_EMAIL_DOMAIN$ ]]; then
+        echo -e "\033[31mERRO\033[0m O e-mail do autor é inválido. Apenas e-mails com o domínio \033[1m$ALLOWED_EMAIL_DOMAIN\033[0m são permitidos."
+        echo "Por favor, configure o e-mail do seu usuário Git para um e-mail corporativo válido, e atualize as assinaturas dos commits."
+        exit 1
+    fi
+done
+
+echo -e "\033[32mTodas as mensagens dos commits e e-mails dos autores são válidos.\033[0m"
+exit 0

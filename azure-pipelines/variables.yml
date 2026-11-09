@@ -1,0 +1,9 @@
+variables:
+  - name: AZURE_DEVOPS_PROJECT
+    value: MONITORA-CLIENT
+  - name: REPO_NAME
+    value: monintora-client
+  - name: current_version
+    value: 0.0.1
+  - name: organization_azure_devops
+    value: renova-ti

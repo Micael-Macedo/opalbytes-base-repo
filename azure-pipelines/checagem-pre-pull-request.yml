@@ -1,0 +1,83 @@
+trigger:
+  branches:
+    exclude:
+      - "*"
+
+pr:
+  branches:
+    include:
+      - develop
+      - hmg
+      - main
+
+pool:
+  name: Azure Pipelines
+  vmImage: "ubuntu-latest"
+
+variables:
+  - template: variables.yml
+
+stages:
+  - stage: checagem_branch
+    displayName: "Checagem de Nome da Branch"
+    jobs:
+      - job: "checagem_nome_branch"
+        displayName: "Checagem de Nome da Branch"
+        steps:
+          - script: |
+              chmod +x ./.azure-pipelines/scripts/checagem-branch
+            displayName: "Definir permissões de execução para script checagem-branch"
+
+          - script: |
+              if [ "$(Build.Reason)" == "PullRequest" ]; then
+                BRANCH_NAME=$(echo $(System.PullRequest.SourceBranch) | sed 's|refs/heads/||')
+                echo "PR detectado. Usando a branch de origem: $BRANCH_NAME"
+                echo "Executando script checagem-branch para a branch: $BRANCH_NAME"
+                ./.azure-pipelines/scripts/checagem-branch $BRANCH_NAME
+              else
+                echo "Nenhum PR detectado. A execução será interrompida."
+                exit 1
+              fi
+            displayName: "Executar script checagem-branch"
+
+  - stage: checagem_commit
+    displayName: "Checagem das Mensagens de Commits"
+    jobs:
+      - job: "checagem_mensagem_commit"
+        displayName: "Checagem das Mensagens de Commits"
+        steps:
+          - checkout: self
+            fetchDepth: 0
+            persistCredentials: true
+
+          - script: |
+              chmod +x ./.azure-pipelines/scripts/checagem-commit
+              sed -i 's/\r$//' ./.azure-pipelines/scripts/checagem-commit
+            displayName: "Definir permissões de execução para script checagem-commit"
+
+          - script: |
+              echo "Listando commits do PR atual"
+
+              # Usa a branch de destino real do PR (develop, hmg ou main)
+              TARGET_BRANCH=$(echo "$SYSTEM_PULLREQUEST_TARGETBRANCH" | sed 's|refs/heads/||')
+              echo "Branch de destino do PR: $TARGET_BRANCH"
+
+              # Fetch autenticado da branch de destino
+              # (persistCredentials: true no checkout mantém o token configurado no git local)
+              git fetch origin $TARGET_BRANCH
+              if [ $? -ne 0 ]; then
+                echo "##[error]Falha ao fazer fetch da branch de destino '$TARGET_BRANCH'. Verifique as permissões do Build Service no repositório."
+                exit 1
+              fi
+
+              # Verifica se os commits existem entre a branch do PR e o destino
+              COMMITS=$(git log origin/$TARGET_BRANCH..HEAD --pretty=format:"%H")
+
+              # Passa a variável TARGET_BRANCH ao script checagem-commit
+              if [ -n "$COMMITS" ]; then
+                  TARGET_BRANCH=$TARGET_BRANCH ./.azure-pipelines/scripts/checagem-commit
+              else
+                  echo "Nenhum commit encontrado para validar."
+                  exit 1
+              fi
+            displayName: "Executar script checagem-commit"
