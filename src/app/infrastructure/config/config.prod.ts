@@ -1,12 +1,15 @@
-import { BASE_HTTP_METHODS, EnvironmentEnum, ICaoAppConfig } from "ngx-opalbytes-core";
-import { ApiPath, ApiUrl } from "./app-endpoints";
+﻿
+import { BASE_PATHS, BASE_HTTP_METHODS } from "./app-config.base";
+import { ApiUrl } from "./app-endpoints";
+import { ICaoAppConfig } from "ngx-opalbytes-core";
 
 export const productionConfig: ICaoAppConfig = {
-    production: true,
-    environment: EnvironmentEnum.production,
-    paths: ApiPath,
-    urls: {
-        [ApiUrl.BOARDGAMEAPI]: "https://ominous-journey-jvjwq6j7x7cp7qp.github.dev"
-    },
-    httpMethods: BASE_HTTP_METHODS
-}
+  production: true,
+  environment: "production",
+  urls: {
+    [ApiUrl.MONITORA]: "https://app-apicftv-detranba.azurewebsites.net/",
+    [ApiUrl.HLS]: "https://cftv-detranba.renova.app.br/hls/",
+  },
+  paths: BASE_PATHS,
+  httpMethods: BASE_HTTP_METHODS,
+};

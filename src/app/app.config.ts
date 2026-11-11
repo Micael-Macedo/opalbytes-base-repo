@@ -3,7 +3,8 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 
-import { caoProvideCore, getConfigByEnvironment, ICaoProvideConfig } from 'ngx-opalbytes-core';
+import { caoProvideCore, ICaoProvideConfig } from 'ngx-opalbytes-core';
+import { getConfigByEnvironment } from '@infrastructure';
 
 export const ENV_CONFIG = getConfigByEnvironment(APP_ENV)
 const caoConfig: ICaoProvideConfig = {

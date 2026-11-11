@@ -1,14 +1,22 @@
 export enum ApiUrl {
-    BOARDGAMEAPI = "BOARDGAMEAPI"
+  MONITORA = "MONITORA",
+  HLS = "HLS",
 }
+
 export enum ApiPath {
+  USUARIO_RECOVERY_PASSWORD = "USUARIO_RECOVERY_PASSWORD",
+  USUARIO_GET_PRIMEIRO_ACESSO = "USUARIO_GET_PRIMEIRO_ACESSO",
+  USUARIO_PRIMEIRO_ACESSO = "USUARIO_PRIMEIRO_ACESSO",
+}
 
-    // EFEITO MANADA
-    MANADA_EFFECT_GET_LIST = "/api/ManadaEffect",
-    MANADA_EFFECT_GET_CARD = "/api/ManadaEffect/{id}",
-    MANADA_EFFECT_POST_CARD = "/api/ManadaEffect",
-    MANADA_EFFECT_DELETE_CARD = "/api/ManadaEffect/{id}",
+export enum AuthPath {
+  TOKEN = "TOKEN",
+}
 
-    //TEAM 3
-
+export enum HttpMethod {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
 }

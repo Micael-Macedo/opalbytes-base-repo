@@ -30,24 +30,49 @@
           },
           "configurations": {
             "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "all"
+              "optimization": false,
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "define": {
+                "APP_ENV": "'prod'",
+                "APP_VERSION": "'dev'",
+                "APP_BUILD_DATE": "'dev'"
+              }
+            },
+            "homologation": {
+              "optimization": false,
+              "extractLicenses": true,
+              "sourceMap": true,
+              "namedChunks": true,
+              "define": {
+                  "APP_ENV": "'hmg'",
+                  "APP_VERSION": "'dev'",
+                  "APP_BUILD_DATE": "'dev'"
+              }
             },
             "development": {
+              "namedChunks": true,
               "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
+              "extractLicenses": true,
+              "sourceMap": true,
+              "define": {
+                  "APP_ENV": "'dev'",
+                  "APP_VERSION": "'dev'",
+                  "APP_BUILD_DATE": "'dev'"
+              }
+            },
+            "local": {
+              "namedChunks": true,
+              "optimization": false,
+              "extractLicenses": true,
+              "sourceMap": true,
+              "outputHashing": "all",
+              "define": {
+                  "APP_ENV": "'local'",
+                  "APP_VERSION": "'dev'",
+                  "APP_BUILD_DATE": "'dev'"
+              }
             }
           },
           "defaultConfiguration": "production"
@@ -58,8 +83,14 @@
             "production": {
               "buildTarget": "opalbytes-base-repo:build:production"
             },
+            "homologation": {
+                "buildTarget": "opalbytes-base-repo:build:homologation"
+            },
             "development": {
-              "buildTarget": "opalbytes-base-repo:build:development"
+                "buildTarget": "opalbytes-base-repo:build:development"
+            },
+            "local": {
+                "buildTarget": "opalbytes-base-repo:build:local"
             }
           },
           "defaultConfiguration": "development"
