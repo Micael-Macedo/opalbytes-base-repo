@@ -72,32 +72,18 @@ export const ROUTES = {
     icon: "/assets/images/svg/building-home-icon.svg",
     permissions: [] as Permission[],
   },
-  MANADA_EFFECT_HOME: {
-    route: "manada-effect",
-    segment: "manada-effect",
-    label: "EFEITO MANADA",
-    icon: "/assets/images/svg/building-home-icon.svg",
+  PRIMEIRO_ACESSO: {
+    route: "/primeiro-acesso",
+    segment: "primeiro-acesso",
+    label: "Primeiro Acesso",
+    icon: "/assets/images/svg/sign-in-icon.svg",
     permissions: [] as Permission[],
   },
-  MANADA_EFFECT_ONLINE: {
-    route: "manada-effect/online",
-    segment: "manada-effect",
-    label: "EFEITO MANADA - ONLINE",
-    icon: "/assets/images/svg/building-home-icon.svg",
-    permissions: [] as Permission[],
-  },
-  MANADA_EFFECT_OFFLINE: {
-    route: "manada-effect/offline",
-    segment: "manada-effect",
-    label: "EFEITO MANADA - OFFLINE",
-    icon: "/assets/images/svg/building-home-icon.svg",
-    permissions: [] as Permission[],
-  },
-  TEAM_3_HOME: {
-    route: "team-3",
-    segment: "team-3",
-    label: "TEAM 3",
-    icon: "/assets/images/svg/building-home-icon.svg",
+  RECUPERACAO_SENHA: {
+    route: "/recuperacao-senha",
+    segment: "recuperacao-senha",
+    label: "Recuperação de Senha",
+    icon: "/assets/images/svg/key-icon.svg",
     permissions: [] as Permission[],
   },
 } as const;
@@ -125,8 +111,8 @@ export type RouteKey = keyof typeof ROUTES;
 
 export const UNLOGGED_ROUTES = [
   ROUTES.LOGIN,
-//   ROUTES.RECUPERACAO_SENHA,
-//   ROUTES.PRIMEIRO_ACESSO,
+  //   ROUTES.RECUPERACAO_SENHA,
+  //   ROUTES.PRIMEIRO_ACESSO,
   ROUTES.NOT_FOUND
 ]
 

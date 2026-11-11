@@ -1,0 +1,74 @@
+<div class="h-dvh relative bg-[var(--color-bg-main)] overflow-hidden">
+  <div class="relative z-10 flex justify-center mt-[4vh]">
+    <div
+      class="w-[max(380px,min(62vh,46vw))] min-[1920px]:w-[max(320px,min(49.8vh,35.4vw))] bg-white border border-[var(--color-border)] rounded-[2.93vh] shadow-[var(--shadow-card)]">
+      <div class="flex flex-col px-[3.1vh] pt-[2.61vh] pb-[28vh]">
+        <div class="flex flex-col items-start gap-[0.2vh]">
+          <h1 class="text-[2.34vh] font-bold text-[var(--color-black)] font-[Ubuntu] leading-normal m-0">
+            Acessar sistema
+          </h1>
+          <p class="text-[1.56vh] font-normal text-[#1B1B1B] font-[Ubuntu] leading-normal not-italic m-0">
+            Faça login para acessar o monitoramento de provas
+          </p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col mt-[3vh] px-[3.5vh] min-[1920px]:px-0">
+          <div class="flex flex-col gap-[0.6vh]">
+            <!-- Email -->
+            <div class="flex flex-col gap-[0.6vh] items-start">
+              <label for="username"
+                class="text-[1.8vh] font-medium text-[var(--color-black)] font-[Ubuntu] leading-normal">Email</label>
+              <input id="username" type="email" formControlName="username" autocomplete="username"
+                placeholder="Digite seu email"
+                class="w-full h-[4.88vh] px-[0.98vh] rounded-[0.98vh] border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[1.6vh] text-[var(--color-black)] placeholder:text-[var(--color-gray-500)] font-[Ubuntu] outline-none transition-all focus:border-[var(--color-input-border-focus)] focus:shadow-[var(--shadow-input-focus)]"
+                [style.borderColor]="form.controls.username.invalid && form.controls.username.touched ? 'var(--color-error-soft)' : null" />
+              @if (form.controls.username.invalid && form.controls.username.touched) {
+              <span role="alert" class="text-[1.17vh] text-[var(--color-error-soft)]">Campo obrigatório</span>
+              }
+            </div>
+
+            <!-- Senha -->
+            <div class="flex flex-col gap-[0.98vh] items-end">
+              <label for="password"
+                class="text-[1.8vh] font-medium text-[var(--color-black)] font-[Ubuntu] leading-normal self-start">Senha</label>
+              <div class="relative w-full">
+                <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                  autocomplete="current-password" placeholder="Digite sua senha"
+                  class="w-full h-[4.88vh] pl-[0.98vh] pr-[3.91vh] rounded-[0.98vh] border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-[1.6vh] text-[var(--color-black)] placeholder:text-[var(--color-gray-500)] font-[Ubuntu] outline-none transition-all focus:border-[var(--color-input-border-focus)] focus:shadow-[var(--shadow-input-focus)]"
+                  [style.borderColor]="form.controls.password.invalid && form.controls.password.touched ? 'var(--color-error-soft)' : null" />
+                <button type="button" (click)="togglePassword()"
+                  [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                  class="absolute right-[0.98vh] top-1/2 -translate-y-1/2 bg-transparent border-0 cursor-pointer flex items-center justify-center">
+                  <img [src]="showPassword ? '/assets/images/svg/eye-icon.svg' : '/assets/images/svg/eye-off-icon.svg'"
+                    alt="" class="h-[2.34vh] w-[2.34vh] opacity-70" />
+                </button>
+              </div>
+              @if (form.controls.password.invalid && form.controls.password.touched) {
+              <span role="alert" class="text-[1.17vh] text-[var(--color-error-soft)]">Campo obrigatório</span>
+              }
+              <button type="button" (click)="goToRecuperacaoSenha()"
+                class="text-[1.7vh] font-normal text-right text-[var(--color-gray-600)] hover:text-[var(--color-primary)] hover:underline bg-transparent border-0 cursor-pointer p-0 font-[Ubuntu]">
+                Esqueceu a Senha?
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-[1.95vh]">
+            <button type="submit" class="hidden"></button>
+            <cao-button [buttonText]="loading ? 'Entrando...' : 'Entrar'" [isLoading]="loading"
+              [isDisabled]="form.invalid" [trailingIcon]="loading ? '' : '/assets/images/svg/arrow-left-orange.svg'" [isLucideIcon]="false"
+              (buttonClick)="submit()" />
+          </div>
+        </form>
+
+        <div class="flex justify-center mt-[1.5vh]">
+          <button type="button" (click)="goToPrimeiroAcesso()"
+            class="inline-flex h-[4.86vh] p-[1.39vh] justify-center items-center gap-[1.39vh] text-[1.9vh] font-medium text-[var(--color-dark)] hover:text-[var(--color-primary)] hover:underline bg-transparent border-0 cursor-pointer font-[Ubuntu]">
+            Primeiro Acesso?
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

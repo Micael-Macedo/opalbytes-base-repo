@@ -1,0 +1,78 @@
+<div class="h-screen flex flex-col bg-[var(--color-bg-main)] overflow-hidden">
+  <main class="flex-1 min-h-0 flex flex-col items-center px-4 pt-6">
+    <div
+      class="w-full max-w-[542px] bg-white rounded-[var(--radius-card)] shadow-[var(--shadow-card)] border border-[var(--color-border)] shrink-0">
+      <div class="px-10 pt-10 pb-12 flex flex-col gap-8">
+        @if (state() === "form") {
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-bold text-[var(--color-dark)]">Primeiro acesso</h1>
+          <p class="text-sm font-normal leading-none text-[var(--color-dark)]">
+            Informe seu e-mail para completar seu cadastro
+          </p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-16">
+          <div class="flex flex-col gap-1.5 ml-4">
+            <label for="email" class="text-sm font-medium text-[var(--color-dark)]">Email</label>
+            <input id="email" type="email" formControlName="email" autocomplete="email" placeholder="Digite seu email"
+              class="w-full h-11 px-4 rounded-[var(--radius-btn)] border border-[var(--color-input-border)] bg-[var(--color-input-bg)] text-sm text-[var(--color-dark)] placeholder:text-[var(--color-gray-500)] outline-none transition-all focus:border-[var(--color-input-border-focus)] focus:shadow-[var(--shadow-input-focus)]"
+              [class.border-[var(--color-error-soft)]]="form.controls.email.invalid && form.controls.email.touched" />
+            @if (form.controls.email.invalid && form.controls.email.touched) {
+            <span class="text-xs text-[var(--color-error-soft)]">
+              @if (form.controls.email.hasError("required")) {
+              Campo obrigatório
+              } @else {
+              E-mail inválido
+              }
+            </span>
+            }
+          </div>
+
+          <button type="submit" class="hidden"></button>
+          <cao-button [buttonText]="'Continuar'" [isLoading]="loading()"
+            [isDisabled]="form.invalid" trailingIcon="/assets/images/svg/arrow-left-orange.svg" [isLucideIcon]="false"
+            (buttonClick)="submit()" />
+        </form>
+        } @else if (state() === "sent") {
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-bold text-[var(--color-dark)]">Verifique seu e-mail</h1>
+          <p class="text-base font-normal leading-none text-[var(--color-dark)]">
+            Enviamos um e-mail com o link para verificar sua conta e definir sua senha
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-2 text-sm text-[var(--color-dark)]">
+          <span>Caso não encontre o e-mail:</span>
+          <ul class="list-disc pl-5 flex flex-col gap-1">
+            <li>verifique sua caixa de spam</li>
+            <li>confirme se o endereço informado está correto</li>
+          </ul>
+        </div>
+
+        <cao-button [buttonText]="'Reenviar Email'" [isLoading]="loading()"
+          trailingIcon="/assets/images/svg/arrow-left-orange.svg" [isLucideIcon]="false"
+          (buttonClick)="reenviar()" />
+        } @else {
+        <div class="flex flex-col gap-1">
+          <h1 class="text-xl font-bold text-[var(--color-dark)]">Cadastro já concluído</h1>
+          <p class="text-sm font-normal leading-none text-[var(--color-dark)]">
+            Este e-mail já concluiu o primeiro acesso. Use a recuperação de senha para acessar sua conta
+          </p>
+        </div>
+
+        <cao-button [buttonText]="'Recuperar senha'"
+          trailingIcon="/assets/images/svg/arrow-left-orange.svg" [isLucideIcon]="false"
+          (buttonClick)="irParaRecuperacaoSenha()" />
+        }
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <button type="button" (click)="voltar()"
+        class="flex items-center gap-2 text-sm font-medium text-[#717070] hover:underline bg-transparent border-0 cursor-pointer p-0">
+        <img src="/assets/images/svg/arrow-left.svg" alt="" class="w-4 h-4" />
+        Voltar para login
+      </button>
+    </div>
+  </main>
+</div>
