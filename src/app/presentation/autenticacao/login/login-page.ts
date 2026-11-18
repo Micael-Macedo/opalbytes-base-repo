@@ -3,7 +3,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 
 import { ROUTES } from "@domain";
 import { NavigationUtil } from "@shared";
-import { AlertService } from "@application";
 
 import { CaoBaseButtonComponent } from "ngx-opalbytes-components";
 
@@ -17,7 +16,6 @@ import { CaoBaseButtonComponent } from "ngx-opalbytes-components";
 export class LoginPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly nav = inject(NavigationUtil);
-  private readonly alertService = inject(AlertService)
 
   form = this.fb.nonNullable.group({
     username: ["", Validators.required],
@@ -30,7 +28,6 @@ export class LoginPageComponent {
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.alertService.warning("Campos obrigatórios não preenchidos");
       return;
     }
     if (this.loading) return;

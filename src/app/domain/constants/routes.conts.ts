@@ -1,17 +1,4 @@
 export type Permission =
-  | "cadastro_rtmp"
-  | "cadastro_posto"
-  | "cadastro_organizacao"
-  | "download_gravacao"
-  | "monitoramento_pratico"
-  | "cadastro_usuario"
-  | "suporte"
-  | "sala_online"
-  | "gerenciamento_permissao"
-  | "gravacoes"
-  | "configuracoes"
-  | "cadastro"
-  | "agendamento"
   | "monitoramento"
   | "status";
 
@@ -24,20 +11,6 @@ export interface ISidebarItem {
 }
 
 export const PermissionsRoles = {
-  CadastroRtmp: "cadastro_rtmp",
-  CadastroPosto: "cadastro_posto",
-  CadastroOrganizacao: "cadastro_organizacao",
-  DownloadGravacao: "download_gravacao",
-  MonitoramentoPratico: "monitoramento_pratico",
-  CadastroUsuario: "cadastro_usuario",
-  Suporte: "suporte",
-  SalaOnline: "sala_online",
-  GerenciamentoPermissao: "gerenciamento_permissao",
-  Gravacoes: "gravacoes",
-  Configuracoes: "configuracoes",
-  Cadastro: "cadastro",
-  Agendamento: "agendamento",
-  Monitoramento: "monitoramento",
   Status: "status",
 } as const satisfies Record<string, Permission>;
 
@@ -90,30 +63,15 @@ export const ROUTES = {
 
 export type RouteKey = keyof typeof ROUTES;
 
-// export const SIDEBAR_ITEMS: ISidebarItem[] = [
-//   ROUTES.HOME,
-//   {
-//     ...ROUTES.CADASTRO,
-//     children: [
-//       ROUTES.CADASTRO_USUARIO,
-//       ROUTES.CADASTRO_POSTO,
-//     ],
-//   },
-//   ROUTES.GERENCIAMENTO_ACESSO,
-//   ROUTES.SALA_ONLINE,
-//   ROUTES.MONITORAMENTO,
-//   ROUTES.GRAVACOES,
-//   ROUTES.PRATICO,
-//   ROUTES.STATUS,
-//   ROUTES.SUPORTE,
-//   ROUTES.CONFIGURACOES,
-// ];
+export const SIDEBAR_ITEMS: ISidebarItem[] = [
+  ROUTES.HOME,
+];
 
 export const UNLOGGED_ROUTES = [
   ROUTES.LOGIN,
+  ROUTES.NOT_FOUND
   //   ROUTES.RECUPERACAO_SENHA,
   //   ROUTES.PRIMEIRO_ACESSO,
-  ROUTES.NOT_FOUND
 ]
 
 // export const ROUTES_WITH_SUBTITLE = [
