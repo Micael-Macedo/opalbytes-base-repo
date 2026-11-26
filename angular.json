@@ -44,6 +44,17 @@
                 "APP_BUILD_DATE": "'dev'"
               }
             },
+                      "stage": {
+            "optimization": false,
+            "extractLicenses": true,
+            "sourceMap": true,
+            "namedChunks": true,
+            "define": {
+                "APP_ENV": "'stage'",
+                "APP_VERSION": "'dev'",
+                "APP_BUILD_DATE": "'dev'"
+            }
+          },
             "homologation": {
               "optimization": false,
               "extractLicenses": true,
@@ -95,6 +106,9 @@
             },
             "local": {
                 "buildTarget": "opalbytes-base-repo:build:local"
+            },
+            "stage": {
+                "buildTarget": "opalbytes-base-repo:build:stage"
             }
           },
           "defaultConfiguration": "development"
